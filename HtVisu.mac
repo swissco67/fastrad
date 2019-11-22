@@ -1,0 +1,143 @@
+#****************************************************************
+#* Visu.mac
+#* Visualization macro for project: Ht
+#* (Geant4 compatible)
+#*
+#*
+#* Neither the authors of this software system, nor their employing 
+#* institutes,nor the agencies providing financial support for this 
+#* work  make  any representation or  warranty, express or implied, 
+#* regarding  this  software system or assume any liability for its 
+#* use.                                                             
+#*
+#*
+#* Creation: 2019/11/22 by Fastrad ((C)2019)
+#* Last Modified: 
+#*****************************************************************
+#
+# Macro file for the initialization phase of "HtVisu.mac"
+# when runing in interactive mode
+#
+/control/verbose 2
+/run/verbose 2
+#
+/geom/detector Dose
+/gps/particle proton
+/gps/pos/type Surface
+/gps/pos/shape Sphere
+/gps/pos/radius 1000.000 mm
+/gps/pos/centre 0.000 0.000 0.000 mm
+/gps/ang/type iso
+/gps/ang/mintheta 0.000 deg
+/gps/ang/maxtheta 180.000 deg
+/gps/ang/minphi 0.000 deg
+/gps/ang/maxphi 360.000 deg
+/gps/ene/type Arb
+/gps/hist/type arb
+# Spectrum is defined for 1s
+/gps/hist/point 10.000  0.000000 
+/gps/hist/point 11.250  265000000000.000000 
+/gps/hist/point 12.500  175000000000.000000 
+/gps/hist/point 13.750  120000000000.000000 
+/gps/hist/point 15.000  85600000000.000000 
+/gps/hist/point 16.250  62700000000.000000 
+/gps/hist/point 17.500  47100000000.000000 
+/gps/hist/point 18.750  36100000000.000000 
+/gps/hist/point 20.000  28100000000.000000 
+/gps/hist/point 21.250  20900000000.000000 
+/gps/hist/point 22.500  17000000000.000000 
+/gps/hist/point 23.750  13900000000.000000 
+/gps/hist/point 25.000  11600000000.000000 
+/gps/hist/point 26.250  9690000000.000000 
+/gps/hist/point 27.500  8190000000.000000 
+/gps/hist/point 28.750  6970000000.000000 
+/gps/hist/point 30.000  5980000000.000000 
+/gps/hist/point 32.500  8760000000.000000 
+/gps/hist/point 35.000  6800000000.000000 
+/gps/hist/point 37.500  5370000000.000000 
+/gps/hist/point 40.000  4320000000.000000 
+/gps/hist/point 42.500  3510000000.000000 
+/gps/hist/point 45.000  2900000000.000000 
+/gps/hist/point 47.500  2410000000.000000 
+/gps/hist/point 50.000  2030000000.000000 
+/gps/hist/point 56.250  3200000000.000000 
+/gps/hist/point 62.500  2330000000.000000 
+/gps/hist/point 68.750  1750000000.000000 
+/gps/hist/point 75.000  1350000000.000000 
+/gps/hist/point 81.250  1060000000.000000 
+/gps/hist/point 87.500  852000000.000000 
+/gps/hist/point 93.750  695000000.000000 
+/gps/hist/point 100.000  575000000.000000 
+/gps/hist/point 112.500  727000000.000000 
+/gps/hist/point 125.000  551000000.000000 
+/gps/hist/point 137.500  429000000.000000 
+/gps/hist/point 150.000  342000000.000000 
+/gps/hist/point 162.500  278000000.000000 
+/gps/hist/point 175.000  229000000.000000 
+/gps/hist/point 187.500  192000000.000000 
+/gps/hist/point 200.000  163000000.000000 
+/gps/hist/point 212.500  125000000.000000 
+/gps/hist/point 225.000  109000000.000000 
+/gps/hist/point 237.500  95500000.000000 
+/gps/hist/point 250.000  84500000.000000 
+/gps/hist/point 262.500  75200000.000000 
+/gps/hist/point 275.000  67400000.000000 
+/gps/hist/point 287.500  60600000.000000 
+/gps/hist/point 300.000  54800000.000000 
+/gps/hist/point 325.000  90900000.000000 
+/gps/hist/point 350.000  76400000.000000 
+/gps/hist/point 375.000  64900000.000000 
+/gps/hist/point 400.000  55800000.000000 
+/gps/hist/point 425.000  48500000.000000 
+/gps/hist/point 450.000  42400000.000000 
+/gps/hist/point 475.000  37400000.000000 
+/gps/hist/point 500.000  33200000.000000 
+/gps/hist/point 562.500  66700000.000000 
+/gps/hist/point 625.000  52000000.000000 
+/gps/hist/point 687.500  41600000.000000 
+/gps/hist/point 750.000  33900000.000000 
+/gps/hist/point 812.500  28200000.000000 
+/gps/hist/point 875.000  23700000.000000 
+/gps/hist/point 937.500  20200000.000000 
+/gps/hist/point 1000.000  17400000.000000 
+/gps/hist/point 1250.000  132000000.000000 
+/gps/hist/point 1500.000  43700000.000000 
+/gps/hist/point 1750.000  17500000.000000 
+/gps/hist/point 2000.000  8050000.000000 
+/gps/hist/inter Lin
+#
+# create empty scene
+#
+/vis/scene/create
+#
+# Create a scene handler for a specific graphics system
+# (Edit the next line(s) to choose another graphic system)
+#
+#/vis/open DAWNFILE
+#/vis/open OGLIX
+#/vis/open OGLSX
+#/vis/open OGLIXm
+#/vis/open OGLSXm
+/vis/open HepRepXML
+#/vis/open VRML1
+#/vis/open VRML2
+#
+# draw scene
+#
+#/vis/viewer/set/style surface
+/vis/viewer/set/style wireframe
+/vis/viewer/set/viewpointThetaPhi 90. 180. deg
+/vis/viewer/zoom 1.
+/vis/viewer/flush
+#
+# for drawing the tracks
+# (if too many tracks cause core dump => storeTrajectory 0)
+#
+/tracking/storeTrajectory 1
+/vis/scene/endOfEventAction accumulate
+
+/tracking/verbose 0
+
+/run/beamOn 50
+
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
