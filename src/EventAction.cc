@@ -30,11 +30,14 @@
 #include "G4ThreeVector.hh"
 #include <vector>
 #include "TrackerSD.hh"
+#include "RunAction.hh"
+#include "G4RunManager.hh"
 
 extern std::vector<SensitiveVolume*>   listeVS_;
 //------------------------------------------------------------------
 
-EventAction::EventAction()
+EventAction::EventAction(RunAction* runAction)
+: G4UserEventAction()
 {
 }
 

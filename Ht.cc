@@ -15,8 +15,6 @@
 * Last Modified: 
 *****************************************************************/
 
-#include "RunManager.hh"
-
 #include "PhysicsListMessenger.hh"
 #include "DetectorConstruction.hh"
 #include "PrimaryGeneratorAction.hh"
@@ -27,7 +25,6 @@
 #include "SteppingVerbose.hh"
 
 #include "G4PhysListFactory.hh"
-#include "G4RunManager.hh"
 #include "G4UImanager.hh"
 #include "G4UIterminal.hh"
 
@@ -36,6 +33,9 @@
 #include "G4UnitsTable.hh"
 
 #include "VisManager.hh"
+#include "G4UIExecutive.hh"
+#include "G4MTRunManager.hh"
+#include "B1ActionInitialization.hh"
 
 //----------------------------------------------------------------------------------------
 
@@ -57,20 +57,19 @@ extern G4bool writeInter_;
 
 //----------------------------------------------------------------------------------------
 // Running Times
-G4Timer duration_;
 G4Timer totalDuration_;
+G4Timer duration_;
 
 // Verbose
 G4int verboseType_;
 
-// RunManager
-RunManager* pRunManager_;
 G4VModularPhysicsList* pCurrentPhys_;
 
 //----------------------------------------------------------------------------------------
 
 int main(int argc,char** argv) 
 {
+    G4cout << "Start!!!" << G4endl;
     totalDuration_.Start();
 
     particleType_ = "proton";
@@ -82,23 +81,28 @@ int main(int argc,char** argv)
 // Verbose output class
 
     G4VSteppingVerbose::SetInstance(new SteppingVerbose);
+    G4cout << "SteppingVerbose!!!" << G4endl;
 
 //-----------------------------------------------------------------------
 // Run manager
+  // Detect interactive mode (if no arguments) and define UI session
+  //
+  G4UIExecutive* ui = 0;
+  if ( argc == 1 ) {
+    G4cout << "G4UIExecutive1!!!" << G4endl;
+    ui = new G4UIExecutive(argc, argv);
+    G4cout << "G4UIExecutive2!!!" << G4endl;
+  }
 
-    pRunManager_ = NULL;
-    pRunManager_ = new RunManager;
-
-    if (!pRunManager_)
-    {
-        G4cout << "RunManager construction error" << G4endl;
-        return 0;
-    }
+  // Construct the default run manager
+  //
+  G4MTRunManager* runManager = new G4MTRunManager;
 
 //-----------------------------------------------------------------------
 // Geometry
 
     G4String GDMLfile = "Ht.gdml";
+    G4cout << "GDMLfile!!!" << G4endl;
 
     DetectorConstruction* pDetecteur = NULL;
 
@@ -110,7 +114,8 @@ int main(int argc,char** argv)
         return 0;
     }
 
-    pRunManager_->SetUserInitialization(pDetecteur);
+    runManager->SetUserInitialization(pDetecteur);
+    G4cout << "DetectorConstruction!!!" << G4endl;
 
 //-----------------------------------------------------------------------
 // Physics
@@ -118,9 +123,15 @@ int main(int argc,char** argv)
     PhysicsListMessenger physicMessenger;    G4PhysListFactory factory;
     pCurrentPhys_ = factory.GetReferencePhysList("FTFP_BERT_HP");
 
-    pRunManager_->SetUserInitialization(pCurrentPhys_);
+    runManager->SetUserInitialization(pCurrentPhys_);
+    G4cout << "pCurrentPhys_!!!" << G4endl;
 
 //-----------------------------------------------------------------------
+
+// User action initialization
+    runManager->SetUserInitialization(new B1ActionInitialization());
+    G4cout << "B1ActionInitialization" << G4endl;
+    
 // Visualization
 
     VisManager* pVisManager = NULL;
@@ -133,120 +144,25 @@ int main(int argc,char** argv)
     }
 
     pVisManager->Initialize();
+    G4cout << "VisManager" << G4endl;
+    
+  // Get the pointer to the User Interface manager
+  G4UImanager* UImanager = G4UImanager::GetUIpointer();
 
-//-----------------------------------------------------------------------
-// User Actions
-
-    pRunManager_->SetUserAction(new PrimaryGeneratorAction);
-    pRunManager_->SetUserAction(new RunAction);
-    pRunManager_->SetUserAction(new EventAction);
-    pRunManager_->SetUserAction(new TrackingAction);
-    pRunManager_->SetUserAction(new SteppingAction);
-        
-//-----------------------------------------------------------------------
-// Get the pointer to the User Interface manager 
-
-    G4UImanager* pUI = NULL;
-    pUI = G4UImanager::GetUIpointer();  
-
-    if (!pUI)
-    {
-        G4cout << "G4UImanager::GetUIpointer() error" << G4endl;
-        return 0;
-    }
-
-//-----------------------------------------------------------------------
-
-    {
-        duration_.Start();
-
-        numberOfBeams_ = 50;
-
-//-----------------------------------------------------------------------
-
-        G4String commande;
-        char buf[1024];
-
-//-----------------------------------------------------------------------
-
-        pUI->ApplyCommand("/run/verbose 0");
-        pUI->ApplyCommand("/event/verbose 0");
-
-//-----------------------------------------------------------------------
-
-        sprintf(buf,"/geom/update");
-        commande = buf;
-        pUI->ApplyCommand(commande);
-
-//-----------------------------------------------------------------------
-
-        sprintf(buf,"/phys/cuts/global/gamma %s", "1.E-6 m");
-        commande = buf;
-        pUI->ApplyCommand(commande);
-        sprintf(buf,"/phys/cuts/global/electron %s", "2.E-6 m");
-        commande = buf;
-        pUI->ApplyCommand(commande);
-        sprintf(buf,"/phys/cuts/global/positron %s", "10.E-6 m");
-        commande = buf;
-        pUI->ApplyCommand(commande);
-
-//-----------------------------------------------------------------------
-/*
-        sprintf(buf,"/gun/particle %s", particleType_.data());
-        commande = buf;
-        pUI->ApplyCommand(commande);
-
-        sprintf(buf,"/gun/energy %f MeV", incidentEnergy_);
-        commande = buf;
-        pUI->ApplyCommand(commande);
-*/
-        sprintf(buf,"/tracking/verbose %d", verboseType_);
-        commande = buf;
-        pUI->ApplyCommand(commande);
-
-//-----------------------------------------------------------------------
-
-        if (argc == 1)
-        // Batch mode
-        { 
-//-----------------------------------------------------------------------
-
-            pRunManager_->Initialize();
-
-//-----------------------------------------------------------------------
-
-            sprintf(buf,"/control/execute %s", "HtTrack.mac");
-            commande = buf;
-            pUI->ApplyCommand(commande);
-        }
-        else
-        // Define (G)UI terminal for interactive mode  
-        {
-            // G4UIterminal is a (dumb) terminal.
-            G4UIsession* pSession = 0;
-
-#ifdef G4UI_USE_TCSH
-            pSession = new G4UIterminal(new G4UItcsh);      
-#else
-            pSession = new G4UIterminal();
-#endif
-
-//-----------------------------------------------------------------------
-
-            pRunManager_->Initialize();
-
-//-----------------------------------------------------------------------
-
-            sprintf(buf,"/control/execute %s", argv[1]);
-            commande = buf;
-            pUI->ApplyCommand(commande);
-
-            pSession->SessionStart();
-
-            delete pSession;
-        }
-
-//---------------------------------------------------------------------------
+  // Process macro or start UI session
+  //
+  if ( ! ui ) { 
+    // batch mode
+    G4String command = "/control/execute ";
+    G4String fileName = argv[1];
+    UImanager->ApplyCommand(command+fileName);
+  }
+  else { 
+    // interactive mode
+    UImanager->ApplyCommand("/control/execute HtTrack.mac");
+    ui->SessionStart();
+    delete ui;
+  }
 
 		for (unsigned int i = 0; i < listeVS_.size(); ++i)
 		{
@@ -264,52 +180,6 @@ int main(int argc,char** argv)
 			}
 		}
 
-//---------------------------------------------------------------------------
-// Energy deposited on detector
-/*
-        G4cout << G4endl;
-        G4cout << "Total energy deposited by protons on detector: " << G4BestUnit(depositedEnergyByProtons_, "Energy") << G4endl;
-        G4cout << G4endl;
-
-        G4cout << G4endl;
-        G4cout << "Total energy deposited by protons on detector: " << G4BestUnit(depositedEnergyByGamma_, "Energy") << G4endl;
-        G4cout << G4endl;
-
-        G4cout << G4endl;
-        G4cout << "Total energy deposited by protons on detector: " << G4BestUnit(depositedEnergyByElectrons_, "Energy") << G4endl;
-        G4cout << G4endl;
-
-//---------------------------------------------------------------------------
-// Dose received by detector
-
-        G4cout << G4endl;
-        G4cout << "Detector's mass: " << detectorMass_ << " kg" << G4endl;
-        G4cout << "Total proton's dose received by detector: " << (depositedEnergyByProtons_ / joule) / detectorMass_ << " Gray" << G4endl;
-        G4cout << "Total proton's dose received by detector: " << 100*(depositedEnergyByProtons_ / joule) / detectorMass_ << " rad" << G4endl;
-        G4cout << G4endl;
-
-        G4cout << G4endl;
-        G4cout << "Total gamma's dose received by detector: " << (depositedEnergyByGamma_ / joule) / detectorMass_ << " Gray" << G4endl;
-        G4cout << "Total gamma's dose received by detector: " << 100*(depositedEnergyByGamma_ / joule) / detectorMass_ << " rad" << G4endl;
-        G4cout << G4endl;
-
-        G4cout << G4endl;
-        G4cout << "Total electron's dose received by detector: " << (depositedEnergyByElectrons_ / joule) / detectorMass_ << " Gray" << G4endl;
-        G4cout << "Total electron's dose received by detector: " << 100*(depositedEnergyByElectrons_ / joule) / detectorMass_ << " rad" << G4endl;
-        G4cout << G4endl;
-*/
-//---------------------------------------------------------------------------
-
-        duration_.Stop();
-
-        G4cout << G4endl;
-        G4cout << "Run Duration: " << duration_.GetRealElapsed()       << " s"  << G4endl;
-        G4cout << "              " << duration_.GetRealElapsed()/60.   << " mn" << G4endl;
-        G4cout << "              " << duration_.GetRealElapsed()/3600. << " h"  << G4endl;
-        G4cout << G4endl;
-    }
-
-//---------------------------------------------------------------------------
 
     totalDuration_.Stop();
 
@@ -319,20 +189,15 @@ int main(int argc,char** argv)
     G4cout << "                     " << totalDuration_.GetRealElapsed()/3600. << " h"  << G4endl;
     G4cout << G4endl;
 
-//---------------------------------------------------------------------------
-// Job termination
-
     if (pVisManager)
     {
         delete pVisManager;
     }
 
-    if (pRunManager_)
+    if (runManager)
     {
-        delete pRunManager_;
+        delete runManager;
     }
-
-//---------------------------------------------------------------------------
 
     return 0;
 }

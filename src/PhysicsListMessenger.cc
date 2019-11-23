@@ -18,7 +18,6 @@
 *****************************************************************/
 
 #include "PhysicsListMessenger.hh"
-#include "RunManager.hh"
 
 #include "G4VModularPhysicsList.hh"
 #include "G4PhysListFactory.hh"
@@ -31,9 +30,10 @@
 
 #include <iomanip>
 #include <sstream>
+#include "G4MTRunManager.hh"
 
 extern G4VModularPhysicsList* pCurrentPhys_;
-extern RunManager* pRunManager_;
+extern G4MTRunManager* runManager;
 
 //---------------------------------------------------------------------
 
@@ -122,7 +122,7 @@ void PhysicsListMessenger::SetNewValue(G4UIcommand* command,G4String newValue)
         if (pCurrentPhys_ == nullptr)
          G4Exception(__FILE__, "BadPhysListName", FatalErrorInArgument,
                      "Unknown physic");
-    pRunManager_->SetUserInitialization(pCurrentPhys_);
+    runManager->SetUserInitialization(pCurrentPhys_);
     }
     else if (command == verboseCmd)
     {

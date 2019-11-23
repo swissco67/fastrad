@@ -21,14 +21,17 @@
 #define __STEPPINGACTION_H__ 1
 
 #include "G4UserSteppingAction.hh"
+class EventAction;
 
 class SteppingAction : public G4UserSteppingAction
 {
 public:
-    SteppingAction();
+    SteppingAction(EventAction* eventAction);
    ~SteppingAction(){};
 
     void UserSteppingAction(const G4Step*);
+  private:
+    EventAction*  fEventAction;
 };
 
 #endif

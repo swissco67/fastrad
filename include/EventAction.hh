@@ -22,17 +22,18 @@
 
 #include "G4UserEventAction.hh"
 
+class RunAction;
 class G4Event;
 
 class EventAction : public G4UserEventAction
 {
 public:
-    EventAction();
+    EventAction(RunAction* runAction);
    ~EventAction();
 
 public:
-    void BeginOfEventAction(const G4Event*);
-    void EndOfEventAction  (const G4Event*);
+    void BeginOfEventAction(const G4Event* event);
+    void EndOfEventAction  (const G4Event* event);
 };
 
 #endif

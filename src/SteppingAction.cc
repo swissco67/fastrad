@@ -22,7 +22,7 @@
 
 #include "G4RunManager.hh"
 
-SteppingAction::SteppingAction()
+SteppingAction::SteppingAction(EventAction* eventAction)
 {
 }
 

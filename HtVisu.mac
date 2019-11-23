@@ -118,9 +118,10 @@
 #/vis/open OGLSX
 #/vis/open OGLIXm
 #/vis/open OGLSXm
-/vis/open HepRepXML
+#/vis/open HepRepXML
 #/vis/open VRML1
 #/vis/open VRML2
+/vis/open OGL 600x600-0+0
 #
 # draw scene
 #
@@ -138,6 +139,6 @@
 
 /tracking/verbose 0
 
-/run/beamOn 50
+/run/beamOn 10
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
